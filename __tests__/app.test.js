@@ -18,11 +18,9 @@ describe("/api/topics", () => {
       .get("/api/topics")
       .expect(200)
       .then(({ body }) => {
-        expect(body).toBeInstanceOf(Array);
-        expect(body).toHaveLength(3);
-        //Can I use this below?
-        expect(body).toEqual(data.topicData);
-        //Or does it need to be more like this:
+        const topics = body;
+        expect(topics).toBeInstanceOf(Array);
+        expect(topics).toHaveLength(3);
         const input = [
           {
             description: "The man, the Mitch, the legend",
@@ -37,7 +35,7 @@ describe("/api/topics", () => {
             slug: "paper",
           },
         ];
-        expect(body).toEqual(input);
+        expect(topics).toEqual(input);
       });
   });
 });
