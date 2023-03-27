@@ -1,5 +1,9 @@
 # Northcoders News API
 
+## Task 2 - Update README
+
+In order to successfully connnect to the two databases you will need to create two .env files for your project: .env.test and .env.development. Add PGDATABASE=nc_news_test to the test file & PGDATABASE=nc_news to the development file.
+
 ## Background
 
 We will be building an API for the purpose of accessing application data programmatically. The intention here is to mimic the building of a real world backend service (such as reddit) which should provide this information to the front end architecture.
