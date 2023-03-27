@@ -20,6 +20,24 @@ describe("/api/topics", () => {
       .then(({ body }) => {
         expect(body).toBeInstanceOf(Array);
         expect(body).toHaveLength(3);
+        //Can I use this below?
+        expect(body).toEqual(data.topicData);
+        //Or does it need to be more like this:
+        const input = [
+          {
+            description: "The man, the Mitch, the legend",
+            slug: "mitch",
+          },
+          {
+            description: "Not dogs",
+            slug: "cats",
+          },
+          {
+            description: "what books are made of",
+            slug: "paper",
+          },
+        ];
+        expect(body).toEqual(input);
       });
   });
 });
