@@ -58,7 +58,7 @@ describe("/api/articles/:article_id", () => {
       .expect(200)
       .then(({ body }) => {
         expect(body).toBeInstanceOf(Object);
-        const input = expect(body).toEqual({
+        const input = {
           article_id: 1,
           title: "Living in the shadow of a great man",
           topic: "mitch",
@@ -68,7 +68,8 @@ describe("/api/articles/:article_id", () => {
           votes: 100,
           article_img_url:
             "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-        });
+        };
+        expect(body).toEqual(input);
       });
   });
 });

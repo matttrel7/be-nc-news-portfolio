@@ -10,7 +10,7 @@ exports.getTopics = (req, res, next) => {
     });
 };
 
-exports.getArticles = (req, res, next) => {
+exports.getArticlesById = (req, res, next) => {
   const id = req.params.articles_id;
   fetchArticles(id)
     .then((article) => {
