@@ -50,3 +50,44 @@ describe("/api/topics - Errors", () => {
       });
   });
 });
+//The created_at value was different, I just manually changed it.. feel like there is another way to do it
+describe("/api/articles/:article_id", () => {
+  it("GET 200: should respond with an article object", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toBeInstanceOf(Object);
+        const input = expect(body).toEqual({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 100,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+});
+
+describe("/api/articles/:article_id - Errors", () => {
+  it("404: a number that isnt a valid id", () => {
+    return request(app)
+      .get("/api/articles/2000")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid ID");
+      });
+  });
+  it("400: a string instead of a number", () => {
+    return request(app)
+      .get("/api/articles/hello")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+});
