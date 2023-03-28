@@ -42,8 +42,6 @@ exports.fetchArticles = () => {
       if (result.rows.length > 0) {
         const articles = result.rows;
         return articles;
-      } else {
-        return Promise.reject({ status: 404, msg: "Invalid request" });
       }
     });
 };
