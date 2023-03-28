@@ -12,6 +12,6 @@ exports.handleCustomErrors = (err, req, res, next) => {
 };
 
 exports.handle500Statuses = (err, req, res, next) => {
-  console.log(err);
+  // console.log(err);
   res.status(500).send({ msg: "Sorry, we have made a server error" });
 };

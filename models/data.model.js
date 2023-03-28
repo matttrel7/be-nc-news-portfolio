@@ -16,7 +16,7 @@ exports.fetchTopics = () => {
   });
 };
 
-exports.fetchArticles = (id) => {
+exports.fetchArticlesById = (id) => {
   return db
     .query(`SELECT * FROM articles WHERE article_id = $1;`, [id])
     .then((result) => {
@@ -25,5 +25,25 @@ exports.fetchArticles = (id) => {
       }
       const article = result.rows[0];
       return article;
+    });
+};
+
+exports.fetchArticles = () => {
+  return db
+    .query(
+      `SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at, articles.votes, articles.article_img_url, CAST(COUNT(comments.article_id)AS INT) AS comment_count
+      FROM comments
+      RIGHT JOIN articles
+      ON articles.article_id = comments.article_id
+      GROUP BY articles.article_id, articles.author, articles.title, articles.topic, articles.created_at, articles.votes, articles.article_img_url
+      ORDER BY created_at DESC;`
+    )
+    .then((result) => {
+      if (result.rows.length > 0) {
+        const articles = result.rows;
+        return articles;
+      } else {
+        return Promise.reject({ status: 404, msg: "Invalid request" });
+      }
     });
 };
