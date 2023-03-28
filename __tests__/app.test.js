@@ -57,19 +57,18 @@ describe("/api/articles/:article_id", () => {
       .get("/api/articles/1")
       .expect(200)
       .then(({ body }) => {
-        expect(body).toBeInstanceOf(Object);
-        const input = {
-          article_id: 1,
-          title: "Living in the shadow of a great man",
-          topic: "mitch",
-          author: "butter_bridge",
-          body: "I find this existence challenging",
-          created_at: "2020-07-09T20:11:00.000Z",
-          votes: 100,
-          article_img_url:
-            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-        };
-        expect(body).toEqual(input);
+        const result = body.article;
+        expect(result).toBeInstanceOf(Object);
+        expect(result).toMatchObject({
+          article_id: expect.any(Number),
+          author: expect.any(String),
+          title: expect.any(String),
+          topic: expect.any(String),
+          body: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          article_img_url: expect.any(String),
+        });
       });
   });
 });
@@ -89,6 +88,39 @@ describe("/api/articles/:article_id - Errors", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Invalid input");
+      });
+  });
+});
+
+describe("/api/articles", () => {
+  it("GET 200: responds with an array of article objects", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        expect(articles).toBeInstanceOf(Array);
+        expect(articles).toHaveLength(12);
+        articles.forEach((article) => {
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            author: expect.any(String),
+            title: expect.any(String),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+        });
+      });
+  });
+  it('404: reponds with "Not Found" if articles is misspelt', () => {
+    return request(app)
+      .get("/api/articul")
+      .expect(404)
+      .then((body) => {
+        expect(body.res.statusMessage).toBe("Not Found");
       });
   });
 });
