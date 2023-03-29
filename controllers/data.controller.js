@@ -2,6 +2,8 @@ const {
   fetchTopics,
   fetchArticles,
   fetchArticlesById,
+  fetchComments,
+  checkArticleExists,
 } = require("../models/data.model");
 
 exports.getTopics = (req, res, next) => {
@@ -29,6 +31,20 @@ exports.getArticles = (req, res, next) => {
   fetchArticles()
     .then((articles) => {
       res.status(200).send({ articles });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getComments = (req, res, next) => {
+  const id = req.params.article_id;
+
+  const commentPromises = [fetchComments(id), checkArticleExists(id)];
+
+  Promise.all(commentPromises)
+    .then(([comments]) => {
+      res.status(200).send({ comments });
     })
     .catch((err) => {
       next(err);
