@@ -126,7 +126,7 @@ describe("/api/articles", () => {
 });
 
 describe("/api/articles/:article_id/comments", () => {
-  it("GET 200: should respond with an array of comment objects", () => {
+  it("GET 200: should respond with an array of comment objects ordered by created_at (desc)", () => {
     return request(app)
       .get("/api/articles/9/comments")
       .expect(200)
@@ -134,40 +134,49 @@ describe("/api/articles/:article_id/comments", () => {
         const result = body.comments;
         expect(result).toBeInstanceOf(Array);
         expect(result).toHaveLength(2);
-        expect(result).toMatchObject([
-          {
+        expect(result).toBeSortedBy("created_at", { descending: true });
+        result.forEach((comment) => {
+          expect(comment).toMatchObject({
             comment_id: expect.any(Number),
             votes: expect.any(Number),
             created_at: expect.any(String),
             author: expect.any(String),
             body: expect.any(String),
             article_id: expect.any(Number),
-          },
-          {
-            comment_id: expect.any(Number),
-            votes: expect.any(Number),
-            created_at: expect.any(String),
-            author: expect.any(String),
-            body: expect.any(String),
-            article_id: expect.any(Number),
-          },
-        ]);
+          });
+        });
       });
   });
-  it("404: a number that isnt a valid id", () => {
+  it("404: a valid id that doesnt exist", () => {
     return request(app)
       .get("/api/articles/2000/comments")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("Invalid ID");
+        expect(body.msg).toBe("Article not found");
       });
   });
-  it("400: a string instead of a number", () => {
+  it("404: comments spelt incorrectly", () => {
     return request(app)
       .get("/api/articles/1/commints")
       .expect(404)
       .then((body) => {
         expect(body.res.statusMessage).toBe("Not Found");
+      });
+  });
+  it("400: a string instead of a number", () => {
+    return request(app)
+      .get("/api/articles/largeredwinepls/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+  it("200: a valid article_id but it has no comment", () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toEqual([]);
       });
   });
 });

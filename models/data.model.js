@@ -46,17 +46,32 @@ exports.fetchArticles = () => {
     });
 };
 
-exports.fetchComments = (id) => {
+exports.fetchComments = (id, order_by) => {
+  let selectCommentsQueryStr = `SELECT * FROM comments`;
+  const queryParams = [];
+
+  if (id) {
+    selectCommentsQueryStr += ` WHERE article_id = $1`;
+    queryParams.push(id);
+  }
+
+  if (order_by) {
+    selectCommentsQueryStr += ` ORDER BY created_at ${order_by}`;
+  } else {
+    selectCommentsQueryStr += ` ORDER BY created_at DESC`;
+  }
+  return db.query(selectCommentsQueryStr, queryParams).then((result) => {
+    const article = result.rows;
+    return article;
+  });
+};
+
+exports.checkArticleExists = (article_id) => {
   return db
-    .query(
-      `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;`,
-      [id]
-    )
+    .query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
     .then((result) => {
-      if (result.rows.length === 0) {
-        return Promise.reject({ status: 404, msg: "Invalid ID" });
+      if (result.rowCount === 0) {
+        return Promise.reject({ status: 404, msg: "Article not found" });
       }
-      const article = result.rows;
-      return article;
     });
 };
