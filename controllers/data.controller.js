@@ -40,10 +40,7 @@ exports.getArticles = (req, res, next) => {
 exports.getComments = (req, res, next) => {
   const id = req.params.article_id;
 
-  const commentPromises = [fetchComments(id)];
-  if (id) {
-    commentPromises.push(checkArticleExists(id));
-  }
+  const commentPromises = [fetchComments(id), checkArticleExists(id)];
 
   Promise.all(commentPromises)
     .then(([comments]) => {
