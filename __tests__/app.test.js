@@ -124,3 +124,50 @@ describe("/api/articles", () => {
       });
   });
 });
+
+describe("/api/articles/:article_id/comments", () => {
+  it("GET 200: should respond with an array of comment objects", () => {
+    return request(app)
+      .get("/api/articles/9/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const result = body.comments;
+        expect(result).toBeInstanceOf(Array);
+        expect(result).toHaveLength(2);
+        expect(result).toMatchObject([
+          {
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: expect.any(Number),
+          },
+          {
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: expect.any(Number),
+          },
+        ]);
+      });
+  });
+  it("404: a number that isnt a valid id", () => {
+    return request(app)
+      .get("/api/articles/2000/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid ID");
+      });
+  });
+  it("400: a string instead of a number", () => {
+    return request(app)
+      .get("/api/articles/1/commints")
+      .expect(404)
+      .then((body) => {
+        expect(body.res.statusMessage).toBe("Not Found");
+      });
+  });
+});

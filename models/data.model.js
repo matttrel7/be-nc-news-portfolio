@@ -45,3 +45,18 @@ exports.fetchArticles = () => {
       }
     });
 };
+
+exports.fetchComments = (id) => {
+  return db
+    .query(
+      `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;`,
+      [id]
+    )
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Invalid ID" });
+      }
+      const article = result.rows;
+      return article;
+    });
+};

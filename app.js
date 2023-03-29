@@ -6,6 +6,7 @@ const {
   getTopics,
   getArticlesById,
   getArticles,
+  getComments,
 } = require("./controllers/data.controller");
 const {
   handlePSQL400s,
@@ -19,6 +20,7 @@ app.get("/api", (req, res) => {
 app.get("/api/topics", getTopics);
 app.get("/api/articles/:article_id", getArticlesById);
 app.get("/api/articles", getArticles);
+app.get("/api/articles/:article_id/comments", getComments);
 
 app.use(handlePSQL400s);
 app.use(handleCustomErrors);
