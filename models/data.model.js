@@ -96,3 +96,14 @@ exports.updateArticle = (votes, articleId) => {
     }
   });
 };
+
+exports.fetchUsers = () => {
+  return db.query(`SELECT * FROM users`).then((result) => {
+    if (result.rowCount > 0) {
+      const users = result.rows;
+      return users;
+    } else {
+      return Promise.reject({ status: 404, msg: "Invalid request" });
+    }
+  });
+};
