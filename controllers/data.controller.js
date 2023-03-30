@@ -5,6 +5,7 @@ const {
   fetchComments,
   checkArticleExists,
   insertComment,
+  updateArticle,
 } = require("../models/data.model");
 
 exports.getTopics = (req, res, next) => {
@@ -58,6 +59,18 @@ exports.postComment = (req, res, next) => {
   insertComment(newComment, articleId)
     .then((comment) => {
       res.status(201).send({ comment });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.patchArticle = (req, res, next) => {
+  const voteNumber = req.body.inc_votes;
+  const articleId = req.params.article_id;
+  updateArticle(voteNumber, articleId)
+    .then((article) => {
+      res.status(201).send({ article });
     })
     .catch((err) => {
       next(err);
