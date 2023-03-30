@@ -84,3 +84,15 @@ exports.insertComment = (newComment, articleId) => {
     return result.rows[0];
   });
 };
+
+exports.updateArticle = (votes, articleId) => {
+  const psqlQuery = `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;`;
+
+  return db.query(psqlQuery, [votes, articleId]).then((result) => {
+    if (result.rowCount > 0) {
+      return result.rows[0];
+    } else {
+      return Promise.reject({ status: 404, msg: "Article not found" });
+    }
+  });
+};

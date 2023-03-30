@@ -237,7 +237,7 @@ describe("/api/articles/:article_id/comments", () => {
       .send(newComment)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Missing comment contents");
+        expect(body.msg).toBe("Missing contents");
       });
   });
   it("POST 400: trying to add a comment with missing author (username)", () => {
@@ -249,7 +249,7 @@ describe("/api/articles/:article_id/comments", () => {
       .send(newComment)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Missing comment contents");
+        expect(body.msg).toBe("Missing contents");
       });
   });
   it("POST 400: trying to add a comment with missing body", () => {
@@ -261,7 +261,7 @@ describe("/api/articles/:article_id/comments", () => {
       .send(newComment)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Missing comment contents");
+        expect(body.msg).toBe("Missing contents");
       });
   });
   it("POST 400: trying to add a comment with incorrect author", () => {
@@ -298,6 +298,163 @@ describe("/api/articles/:article_id/comments", () => {
             created_at: expect.any(String),
           },
         });
+      });
+  });
+});
+
+describe("/api/articles/:article_id", () => {
+  it("PATCH: 201 repsonds with the updated article (votes incremented)", () => {
+    const newVote = {
+      inc_votes: 1,
+    };
+    return request(app)
+      .patch("/api/articles/5")
+      .send(newVote)
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toEqual({
+          article: {
+            article_id: 5,
+            title: "UNCOVERED: catspiracy to bring down democracy",
+            author: "rogersop",
+            votes: 1,
+            topic: "cats",
+            body: expect.any(String),
+            created_at: expect.any(String),
+            article_img_url: expect.any(String),
+          },
+        });
+      });
+  });
+  it("PATCH: 201 repsonds with the updated article (votes decremented)", () => {
+    const newVote = {
+      inc_votes: -50,
+    };
+    return request(app)
+      .patch("/api/articles/5")
+      .send(newVote)
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toEqual({
+          article: {
+            article_id: 5,
+            title: "UNCOVERED: catspiracy to bring down democracy",
+            author: "rogersop",
+            votes: -50,
+            topic: "cats",
+            body: expect.any(String),
+            created_at: expect.any(String),
+            article_img_url: expect.any(String),
+          },
+        });
+      });
+  });
+  it("PATCH: 201 repsonds with the updated article (votes incremented)", () => {
+    const newVote = {
+      inc_votes: 1,
+    };
+    return request(app)
+      .patch("/api/articles/5")
+      .send(newVote)
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toEqual({
+          article: {
+            article_id: 5,
+            title: "UNCOVERED: catspiracy to bring down democracy",
+            author: "rogersop",
+            votes: 1,
+            topic: "cats",
+            body: expect.any(String),
+            created_at: expect.any(String),
+            article_img_url: expect.any(String),
+          },
+        });
+      });
+  });
+  it("PATCH 404: trying to add votes to an article_id that doesnt exist", () => {
+    const newVote = {
+      inc_votes: 1,
+    };
+    return request(app)
+      .patch("/api/articles/25")
+      .send(newVote)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article not found");
+      });
+  });
+  it("PATCH 404: misspell articles", () => {
+    const newVote = {
+      inc_votes: 1,
+    };
+    return request(app)
+      .patch("/api/articuls/5")
+      .send(newVote)
+      .expect(404)
+      .then((body) => {
+        expect(body.res.statusMessage).toBe("Not Found");
+      });
+  });
+  it("PATCH 400: trying to update with an empty object", () => {
+    const newVote = {};
+    return request(app)
+      .patch("/api/articles/5")
+      .send(newVote)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Missing contents");
+      });
+  });
+  it("PATCH 404: not a number at the end of the url", () => {
+    const newVote = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/articles/hello")
+      .send(newVote)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+  it("PATCH 400: trying to update with an object with the wrong property", () => {
+    const newVote = { author: 1 };
+    return request(app)
+      .patch("/api/articles/5")
+      .send(newVote)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Missing contents");
+      });
+  });
+  it("PATCH 201: trying to update with an object with multiple propertys - updates and ignores author property", () => {
+    const newVote = { author: 1, inc_votes: 1 };
+    return request(app)
+      .patch("/api/articles/5")
+      .send(newVote)
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toEqual({
+          article: {
+            article_id: 5,
+            title: "UNCOVERED: catspiracy to bring down democracy",
+            author: "rogersop",
+            votes: 1,
+            topic: "cats",
+            body: expect.any(String),
+            created_at: expect.any(String),
+            article_img_url: expect.any(String),
+          },
+        });
+      });
+  });
+  it("PATCH 400: inc_vote is not an integer", () => {
+    const newVote = { inc_votes: "ten" };
+    return request(app)
+      .patch("/api/articles/5")
+      .send(newVote)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
       });
   });
 });
