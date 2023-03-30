@@ -406,7 +406,7 @@ describe("/api/articles/:article_id", () => {
         expect(body.msg).toBe("Missing contents");
       });
   });
-  it.only("PATCH 404: not a number at the end of the url", () => {
+  it("PATCH 404: not a number at the end of the url", () => {
     const newVote = { inc_votes: 1 };
     return request(app)
       .patch("/api/articles/hello")
