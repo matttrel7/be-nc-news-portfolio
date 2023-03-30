@@ -489,7 +489,6 @@ describe("/api/comments/:comment_id", () => {
       .delete("/api/commints/10")
       .expect(404)
       .then((body) => {
-        console.log(body);
         expect(body.res.statusMessage).toBe("Not Found");
       });
   });
