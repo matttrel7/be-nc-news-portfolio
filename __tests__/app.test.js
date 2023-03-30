@@ -302,7 +302,7 @@ describe("/api/articles/:article_id/comments", () => {
   });
 });
 
-describe.only("/api/articles/:article_id", () => {
+describe("/api/articles/:article_id", () => {
   it("PATCH: 201 repsonds with the updated article (votes incremented)", () => {
     const newVote = {
       inc_votes: 1,
@@ -447,15 +447,4 @@ describe.only("/api/articles/:article_id", () => {
         });
       });
   });
-
-  // it("POST 400: trying to add a comment with nothing in it", () => {
-  //   const newComment = {};
-  //   return request(app)
-  //     .post("/api/articles/5/comments")
-  //     .send(newComment)
-  //     .expect(400)
-  //     .then(({ body }) => {
-  //       expect(body.msg).toBe("Missing comment contents");
-  //     });
-  // });
 });
