@@ -67,6 +67,7 @@ exports.fetchComments = (id, order_by) => {
 };
 
 exports.checkArticleExists = (article_id) => {
+  //console.log(article_id);
   return db
     .query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
     .then((result) => {
@@ -74,4 +75,14 @@ exports.checkArticleExists = (article_id) => {
         return Promise.reject({ status: 404, msg: "Article not found" });
       }
     });
+};
+
+exports.insertComment = (newComment, articleId) => {
+  const { body, author } = newComment;
+
+  const psqlQuery = `INSERT INTO comments (body, article_id, author) VALUES ($1, $2, $3) RETURNING *;`;
+
+  return db.query(psqlQuery, [body, articleId, author]).then((result) => {
+    return result.rows[0];
+  });
 };
