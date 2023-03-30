@@ -310,7 +310,7 @@ describe("/api/articles/:article_id", () => {
     return request(app)
       .patch("/api/articles/5")
       .send(newVote)
-      .expect(201)
+      .expect(200)
       .then((response) => {
         expect(response.body).toEqual({
           article: {
@@ -333,7 +333,7 @@ describe("/api/articles/:article_id", () => {
     return request(app)
       .patch("/api/articles/5")
       .send(newVote)
-      .expect(201)
+      .expect(200)
       .then((response) => {
         expect(response.body).toEqual({
           article: {
@@ -356,7 +356,7 @@ describe("/api/articles/:article_id", () => {
     return request(app)
       .patch("/api/articles/5")
       .send(newVote)
-      .expect(201)
+      .expect(200)
       .then((response) => {
         expect(response.body).toEqual({
           article: {
@@ -431,7 +431,7 @@ describe("/api/articles/:article_id", () => {
     return request(app)
       .patch("/api/articles/5")
       .send(newVote)
-      .expect(201)
+      .expect(200)
       .then((response) => {
         expect(response.body).toEqual({
           article: {
@@ -445,6 +445,16 @@ describe("/api/articles/:article_id", () => {
             article_img_url: expect.any(String),
           },
         });
+      });
+  });
+  it("PATCH 400: inc_vote is not an integer", () => {
+    const newVote = { inc_votes: "ten" };
+    return request(app)
+      .patch("/api/articles/5")
+      .send(newVote)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
       });
   });
 });

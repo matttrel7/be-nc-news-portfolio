@@ -70,7 +70,7 @@ exports.patchArticle = (req, res, next) => {
   const articleId = req.params.article_id;
   updateArticle(voteNumber, articleId)
     .then((article) => {
-      res.status(201).send({ article });
+      res.status(200).send({ article });
     })
     .catch((err) => {
       next(err);
