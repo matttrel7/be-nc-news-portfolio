@@ -75,3 +75,12 @@ exports.checkArticleExists = (article_id) => {
       }
     });
 };
+
+exports.insertComment = (newComment, articleId) => {
+  const { body, author } = newComment;
+  const psqlQuery = `INSERT INTO comments (body, article_id, author) VALUES ($1, $2, $3) RETURNING *;`;
+
+  return db.query(psqlQuery, [body, articleId, author]).then((result) => {
+    return result.rows[0];
+  });
+};

@@ -180,3 +180,124 @@ describe("/api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("/api/articles/:article_id/comments", () => {
+  it("POST: 201 responds with the new posted comment", () => {
+    const newComment = {
+      body: "Long live cats",
+      author: "rogersop",
+    };
+    return request(app)
+      .post("/api/articles/5/comments")
+      .send(newComment)
+      .expect(201)
+      .then((response) => {
+        expect(response.body).toEqual({
+          comment: {
+            comment_id: expect.any(Number),
+            body: "Long live cats",
+            article_id: 5,
+            author: "rogersop",
+            votes: 0,
+            created_at: expect.any(String),
+          },
+        });
+      });
+  });
+  it("POST 400: trying to add a comment to an article_id that doesnt exist", () => {
+    const newComment = {
+      body: "Long live cats",
+      author: "rogersop",
+    };
+    return request(app)
+      .post("/api/articles/25/comments")
+      .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article or author not found");
+      });
+  });
+  it("POST 400: misspell comments", () => {
+    const newComment = {
+      body: "Long live cats",
+      author: "rogersop",
+    };
+    return request(app)
+      .post("/api/articles/5/commints")
+      .send(newComment)
+      .expect(404)
+      .then((body) => {
+        expect(body.res.statusMessage).toBe("Not Found");
+      });
+  });
+  it("POST 400: trying to add a comment with nothing in it", () => {
+    const newComment = {};
+    return request(app)
+      .post("/api/articles/5/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Missing comment contents");
+      });
+  });
+  it("POST 400: trying to add a comment with missing author (username)", () => {
+    const newComment = {
+      body: "Long live cats",
+    };
+    return request(app)
+      .post("/api/articles/5/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Missing comment contents");
+      });
+  });
+  it("POST 400: trying to add a comment with missing body", () => {
+    const newComment = {
+      author: "rogersop",
+    };
+    return request(app)
+      .post("/api/articles/5/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Missing comment contents");
+      });
+  });
+  it("POST 400: trying to add a comment with incorrect author", () => {
+    const newComment = {
+      body: "Long live cats",
+      author: "matt",
+    };
+    return request(app)
+      .post("/api/articles/5/comments")
+      .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article or author not found");
+      });
+  });
+  it("POST 201: responds with the new posted comment and ignores hobbies", () => {
+    const newComment = {
+      body: "Long live cats",
+      author: "rogersop",
+      hobbies: "football",
+    };
+    return request(app)
+      .post("/api/articles/5/comments")
+      .send(newComment)
+      .expect(201)
+      .then((response) => {
+        expect(response.body).toEqual({
+          comment: {
+            comment_id: expect.any(Number),
+            body: "Long live cats",
+            article_id: 5,
+            author: "rogersop",
+            votes: 0,
+            created_at: expect.any(String),
+          },
+        });
+      });
+  });
+});

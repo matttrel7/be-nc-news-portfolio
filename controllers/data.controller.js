@@ -4,6 +4,7 @@ const {
   fetchArticlesById,
   fetchComments,
   checkArticleExists,
+  insertComment,
 } = require("../models/data.model");
 
 exports.getTopics = (req, res, next) => {
@@ -45,6 +46,18 @@ exports.getComments = (req, res, next) => {
   Promise.all(commentPromises)
     .then(([comments]) => {
       res.status(200).send({ comments });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postComment = (req, res, next) => {
+  const newComment = req.body;
+  const articleId = req.params.article_id;
+  insertComment(newComment, articleId)
+    .then((comment) => {
+      res.status(201).send({ comment });
     })
     .catch((err) => {
       next(err);
