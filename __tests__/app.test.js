@@ -212,7 +212,7 @@ describe("/api/articles/:article_id/comments", () => {
     return request(app)
       .post("/api/articles/25/comments")
       .send(newComment)
-      .expect(400)
+      .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Article or author not found");
       });
@@ -272,9 +272,32 @@ describe("/api/articles/:article_id/comments", () => {
     return request(app)
       .post("/api/articles/5/comments")
       .send(newComment)
-      .expect(400)
+      .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Article or author not found");
+      });
+  });
+  it("POST 201: responds with the new posted comment and ignores hobbies", () => {
+    const newComment = {
+      body: "Long live cats",
+      author: "rogersop",
+      hobbies: "football",
+    };
+    return request(app)
+      .post("/api/articles/5/comments")
+      .send(newComment)
+      .expect(201)
+      .then((response) => {
+        expect(response.body).toEqual({
+          comment: {
+            comment_id: expect.any(Number),
+            body: "Long live cats",
+            article_id: 5,
+            author: "rogersop",
+            votes: 0,
+            created_at: expect.any(String),
+          },
+        });
       });
   });
 });
