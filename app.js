@@ -9,6 +9,7 @@ const {
   getComments,
   postComment,
   patchArticle,
+  deleteComment,
 } = require("./controllers/data.controller");
 const {
   handlePSQL400s,
@@ -25,6 +26,7 @@ app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getComments);
 app.post("/api/articles/:article_id/comments", postComment);
 app.patch("/api/articles/:article_id", patchArticle);
+app.delete("/api/comments/:comment_id", deleteComment);
 
 app.use(handlePSQL400s);
 app.use(handleCustomErrors);
