@@ -590,7 +590,7 @@ describe("/api/articles", () => {
         expect(originalArticles).toEqual(sortedArticles);
       });
   });
-  it("GET 200: accepts an topic query which returns only the articles of the specified topic", () => {
+  it("GET 200: accepts a topic query which returns only the articles of the specified topic", () => {
     return request(app)
       .get("/api/articles?topic=cats")
       .expect(200)
@@ -626,6 +626,14 @@ describe("/api/articles", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Invalid Order Query");
+      });
+  });
+  it("GET 404: a topic query that exists but has no articles", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article not found");
       });
   });
 });
