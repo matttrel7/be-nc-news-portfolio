@@ -79,15 +79,8 @@ exports.fetchArticles = (sort_by, order, topic) => {
   } else {
     articlesQueryStr += ` ORDER BY created_at ${order || "DESC"}`;
   }
-  console.log(articlesQueryStr);
   return db.query(articlesQueryStr, queryParams).then((result) => {
     return result.rows;
-    // if (result.rowCount > 0) {
-    //   const articles = result.rows;
-    //   return articles;
-    // } else {
-    //   return Promise.reject({ status: 404, msg: "Article not found" });
-    // }
   });
 };
 
