@@ -27,7 +27,16 @@ exports.fetchTopics = (topic) => {
 
 exports.fetchArticlesById = (id) => {
   return db
-    .query(`SELECT * FROM articles WHERE article_id = $1;`, [id])
+    .query(
+      `SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.body, articles.created_at, articles.votes, articles.article_img_url, CAST(COUNT(comments.article_id)AS INT) AS comment_count
+      FROM comments
+      RIGHT JOIN articles
+      ON articles.article_id = comments.article_id
+      WHERE articles.article_id = $1
+      GROUP BY articles.article_id, articles.author, articles.title, articles.topic, articles.body, articles.created_at, articles.votes, articles.article_img_url
+      ORDER BY created_at DESC;`,
+      [id]
+    )
     .then((result) => {
       if (result.rows.length === 0) {
         return Promise.reject({ status: 404, msg: "Invalid ID" });
