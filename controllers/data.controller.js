@@ -32,8 +32,16 @@ exports.getArticlesById = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  fetchArticles()
-    .then((articles) => {
+  const { sort_by, order, topic } = req.query;
+
+  fetchTopics(topic)
+    .then((result) => {
+      if (result.length === 0) {
+        return Promise.reject({ status: 404, msg: "Invalid topic" });
+      }
+      return fetchArticles(sort_by, order, topic);
+    })
+    .then((articles, result) => {
       res.status(200).send({ articles });
     })
     .catch((err) => {
@@ -79,17 +87,21 @@ exports.patchArticle = (req, res, next) => {
     });
 };
 
-
 exports.getUsers = (req, res, next) => {
   fetchUsers()
     .then((users) => {
       res.status(200).send({ users });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
 exports.deleteComment = (req, res, next) => {
   const commentId = req.params.comment_id;
   removeComment(commentId)
     .then((comment) => {
       res.status(204).send({ msg: "No content" });
-
     })
     .catch((err) => {
       next(err);

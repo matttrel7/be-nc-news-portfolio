@@ -1,12 +1,21 @@
 const db = require("../db/connection");
+const articles = require("../db/data/test-data/articles");
 const {
   convertTimestampToDate,
   createRef,
   formatComments,
 } = require("../db/seeds/utils");
 
-exports.fetchTopics = () => {
-  return db.query(`SELECT * FROM topics`).then((result) => {
+exports.fetchTopics = (topic) => {
+  let selectTopicQueryStr = `SELECT * FROM topics`;
+  const queryParams = [];
+
+  if (topic) {
+    selectTopicQueryStr += ` WHERE slug = $1`;
+    queryParams.push(topic);
+  }
+
+  return db.query(selectTopicQueryStr, queryParams).then((result) => {
     if (result.rows.length > 0) {
       const topics = result.rows;
       return topics;
@@ -28,22 +37,51 @@ exports.fetchArticlesById = (id) => {
     });
 };
 
-exports.fetchArticles = () => {
-  return db
-    .query(
-      `SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at, articles.votes, articles.article_img_url, CAST(COUNT(comments.article_id)AS INT) AS comment_count
-      FROM comments
-      RIGHT JOIN articles
-      ON articles.article_id = comments.article_id
-      GROUP BY articles.article_id, articles.author, articles.title, articles.topic, articles.created_at, articles.votes, articles.article_img_url
-      ORDER BY created_at DESC;`
-    )
-    .then((result) => {
-      if (result.rows.length > 0) {
-        const articles = result.rows;
-        return articles;
-      }
-    });
+exports.fetchArticles = (sort_by, order, topic) => {
+  if (
+    sort_by &&
+    sort_by !== "article_id" &&
+    sort_by !== "title" &&
+    sort_by !== "author" &&
+    sort_by !== "comment_count" &&
+    sort_by !== "topic" &&
+    sort_by !== "created_at" &&
+    sort_by !== "article_img_url" &&
+    sort_by !== "votes" &&
+    sort_by !== "body"
+  ) {
+    return Promise.reject({ status: 400, msg: "Invalid Sort Query" });
+  }
+  if (
+    order &&
+    order !== "desc" &&
+    order !== "asc" &&
+    order !== "DESC" &&
+    order !== "ASC"
+  ) {
+    return Promise.reject({ status: 400, msg: "Invalid Order Query" });
+  }
+
+  const queryParams = [];
+  let articlesQueryStr = `SELECT articles.article_id, articles.title, articles.author, articles.topic, articles.created_at, articles.votes, articles.article_img_url, CAST(COUNT(comments.article_id)AS INT) AS comment_count
+  FROM comments
+  RIGHT JOIN articles
+  ON articles.article_id = comments.article_id`;
+
+  if (topic) {
+    articlesQueryStr += ` WHERE topic = '${topic}'`;
+  }
+
+  articlesQueryStr += ` GROUP BY articles.article_id, articles.author, articles.title, articles.topic, articles.created_at, articles.votes, articles.article_img_url`;
+
+  if (sort_by) {
+    articlesQueryStr += ` ORDER BY ${sort_by} ${order || "DESC"}`;
+  } else {
+    articlesQueryStr += ` ORDER BY created_at ${order || "DESC"}`;
+  }
+  return db.query(articlesQueryStr, queryParams).then((result) => {
+    return result.rows;
+  });
 };
 
 exports.fetchComments = (id, order_by) => {
@@ -97,7 +135,6 @@ exports.updateArticle = (votes, articleId) => {
   });
 };
 
-
 exports.fetchUsers = () => {
   return db.query(`SELECT * FROM users`).then((result) => {
     if (result.rowCount > 0) {
@@ -105,6 +142,9 @@ exports.fetchUsers = () => {
       return users;
     } else {
       return Promise.reject({ status: 404, msg: "Invalid request" });
+    }
+  });
+};
 
 exports.removeComment = (commentId) => {
   const psqlQuery = `DELETE FROM comments WHERE comment_id = $1 RETURNING *;`;
@@ -114,7 +154,6 @@ exports.removeComment = (commentId) => {
       return result.rows[0];
     } else {
       return Promise.reject({ status: 404, msg: "Comment not found" });
-
     }
   });
 };
