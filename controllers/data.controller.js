@@ -32,7 +32,8 @@ exports.getArticlesById = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  fetchArticles()
+  const { sort_by, order, topic } = req.query;
+  fetchArticles(sort_by, order, topic)
     .then((articles) => {
       res.status(200).send({ articles });
     })
@@ -79,17 +80,21 @@ exports.patchArticle = (req, res, next) => {
     });
 };
 
-
 exports.getUsers = (req, res, next) => {
   fetchUsers()
     .then((users) => {
       res.status(200).send({ users });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
 exports.deleteComment = (req, res, next) => {
   const commentId = req.params.comment_id;
   removeComment(commentId)
     .then((comment) => {
       res.status(204).send({ msg: "No content" });
-
     })
     .catch((err) => {
       next(err);

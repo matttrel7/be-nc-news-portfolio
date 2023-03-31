@@ -101,6 +101,7 @@ describe("/api/articles", () => {
         const articles = body.articles;
         expect(articles).toBeInstanceOf(Array);
         expect(articles).toHaveLength(12);
+        expect(articles).toBeSortedBy("created_at", { descending: true });
         articles.forEach((article) => {
           expect(article).toMatchObject({
             article_id: expect.any(Number),
@@ -459,7 +460,6 @@ describe("/api/articles/:article_id", () => {
   });
 });
 
-
 describe("/api/users", () => {
   it("GET 200: repsonds with array of objects of users", () => {
     return request(app)
@@ -468,6 +468,7 @@ describe("/api/users", () => {
       .then(({ body }) => {
         const result = body.users;
         expect(result).toBeInstanceOf(Array);
+        expect(result).toHaveLength(4);
         result.forEach((user) => {
           expect(user).toMatchObject({
             username: expect.any(String),
@@ -488,6 +489,12 @@ describe("/api/users", () => {
   it('404: reponds with "Not Found" if given an integer instead of string', () => {
     return request(app)
       .get("/api/10")
+      .expect(404)
+      .then((body) => {
+        expect(body.res.statusMessage).toBe("Not Found");
+      });
+  });
+});
 
 describe("/api/comments/:comment_id", () => {
   it("DELETE 204: should delete comment from the id provided and return no content", () => {
@@ -520,6 +527,105 @@ describe("/api/comments/:comment_id", () => {
       .expect(404)
       .then((body) => {
         expect(body.res.statusMessage).toBe("Not Found");
+      });
+  });
+});
+
+describe("/api/articles", () => {
+  it("GET 200: accepts a sort_by query which sorts by any valid column (article_id)", () => {
+    return request(app)
+      .get("/api/articles?sort_by=article_id")
+      .expect(200)
+      .then(({ body }) => {
+        const originalArticles = body.articles;
+        const articleClone = JSON.parse(JSON.stringify(originalArticles));
+        expect(originalArticles).toHaveLength(12);
+        const sortedArticles = articleClone.sort((articleA, articleB) => {
+          return articleB.article_id - articleA.article_id;
+        });
+        expect(originalArticles).toEqual(sortedArticles);
+      });
+  });
+  it("GET 200: accepts a sort_by query which sorts by any valid column (title)", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title")
+      .expect(200)
+      .then(({ body }) => {
+        const originalArticles = body.articles;
+        const articleClone = JSON.parse(JSON.stringify(originalArticles));
+        expect(originalArticles).toHaveLength(12);
+        const sortedArticles = articleClone.sort((articleA, articleB) => {
+          return articleB.title - articleA.title;
+        });
+        expect(originalArticles).toEqual(sortedArticles);
+      });
+  });
+  it("GET 200: accepts a sort_by query which sorts by any valid column but defaults to created_at and DESC order and all articles", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const originalArticles = body.articles;
+        const articleClone = JSON.parse(JSON.stringify(originalArticles));
+        expect(originalArticles).toHaveLength(12);
+        expect(originalArticles).toBeInstanceOf(Array);
+        const sortedArticles = articleClone.sort((articleA, articleB) => {
+          return articleB.created_at - articleA.created_at;
+        });
+        expect(originalArticles).toEqual(sortedArticles);
+      });
+  });
+  it("GET 200: accepts an order query which can order by ASC or asc", () => {
+    return request(app)
+      .get("/api/articles?order=ASC")
+      .expect(200)
+      .then(({ body }) => {
+        const originalArticles = body.articles;
+        const articleClone = JSON.parse(JSON.stringify(originalArticles));
+        expect(originalArticles).toHaveLength(12);
+        expect(originalArticles).toBeInstanceOf(Array);
+        const sortedArticles = articleClone.sort((articleA, articleB) => {
+          return articleA.created_at - articleB.created_at;
+        });
+        expect(originalArticles).toEqual(sortedArticles);
+      });
+  });
+  it("GET 200: accepts an topic query which returns only the articles of the specified topic", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        expect(articles).toBeInstanceOf(Array);
+        expect(articles).toHaveLength(1);
+        const checkTopics = articles.every(
+          (article) => article.topic === "cats"
+        );
+        expect(checkTopics).toBe(true);
+      });
+  });
+  it("GET 404: gets error when topic doesn't exist", () => {
+    return request(app)
+      .get("/api/articles?topic=dogs")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article not found");
+      });
+  });
+  it("GET 400: trying to sort_by a property that doesnt exist", () => {
+    return request(app)
+      .get("/api/articles?sort_by=name")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid Sort Query");
+      });
+  });
+  it("GET 400: trying to order by an invalid order", () => {
+    return request(app)
+      .get("/api/articles?order=up")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid Order Query");
       });
   });
 });
