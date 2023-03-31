@@ -1,12 +1,21 @@
 const db = require("../db/connection");
+const articles = require("../db/data/test-data/articles");
 const {
   convertTimestampToDate,
   createRef,
   formatComments,
 } = require("../db/seeds/utils");
 
-exports.fetchTopics = () => {
-  return db.query(`SELECT * FROM topics`).then((result) => {
+exports.fetchTopics = (topic) => {
+  let selectTopicQueryStr = `SELECT * FROM topics`;
+  const queryParams = [];
+
+  if (topic) {
+    selectTopicQueryStr += ` WHERE slug = $1`;
+    queryParams.push(topic);
+  }
+
+  return db.query(selectTopicQueryStr, queryParams).then((result) => {
     if (result.rows.length > 0) {
       const topics = result.rows;
       return topics;
@@ -70,14 +79,15 @@ exports.fetchArticles = (sort_by, order, topic) => {
   } else {
     articlesQueryStr += ` ORDER BY created_at ${order || "DESC"}`;
   }
-
+  console.log(articlesQueryStr);
   return db.query(articlesQueryStr, queryParams).then((result) => {
-    if (result.rowCount > 0) {
-      const articles = result.rows;
-      return articles;
-    } else {
-      return Promise.reject({ status: 404, msg: "Article not found" });
-    }
+    return result.rows;
+    // if (result.rowCount > 0) {
+    //   const articles = result.rows;
+    //   return articles;
+    // } else {
+    //   return Promise.reject({ status: 404, msg: "Article not found" });
+    // }
   });
 };
 

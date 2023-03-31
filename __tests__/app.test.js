@@ -609,7 +609,7 @@ describe("/api/articles", () => {
       .get("/api/articles?topic=dogs")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("Article not found");
+        expect(body.msg).toBe("Invalid request");
       });
   });
   it("GET 400: trying to sort_by a property that doesnt exist", () => {
@@ -628,12 +628,15 @@ describe("/api/articles", () => {
         expect(body.msg).toBe("Invalid Order Query");
       });
   });
-  it("GET 404: a topic query that exists but has no articles", () => {
+  it("GET 200: a topic query that exists but has no articles", () => {
     return request(app)
       .get("/api/articles?topic=paper")
-      .expect(404)
+      .expect(200)
       .then(({ body }) => {
-        expect(body.msg).toBe("Article not found");
+        const articles = body.articles;
+        expect(articles).toBeInstanceOf(Array);
+        expect(articles).toHaveLength(0);
+        expect(articles).toEqual([]);
       });
   });
 });

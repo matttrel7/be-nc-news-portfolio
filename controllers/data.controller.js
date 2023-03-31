@@ -33,8 +33,16 @@ exports.getArticlesById = (req, res, next) => {
 
 exports.getArticles = (req, res, next) => {
   const { sort_by, order, topic } = req.query;
-  fetchArticles(sort_by, order, topic)
-    .then((articles) => {
+
+  fetchTopics(topic)
+    .then((result) => {
+      if (result.length === 0) {
+        return Promise.reject({ status: 404, msg: "Invalid topic" });
+      }
+      return fetchArticles(sort_by, order, topic);
+    })
+    .then((articles, result) => {
+      console.log(result);
       res.status(200).send({ articles });
     })
     .catch((err) => {
