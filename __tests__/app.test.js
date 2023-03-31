@@ -459,6 +459,7 @@ describe("/api/articles/:article_id", () => {
   });
 });
 
+
 describe("/api/users", () => {
   it("GET 200: repsonds with array of objects of users", () => {
     return request(app)
@@ -487,6 +488,35 @@ describe("/api/users", () => {
   it('404: reponds with "Not Found" if given an integer instead of string', () => {
     return request(app)
       .get("/api/10")
+
+describe("/api/comments/:comment_id", () => {
+  it("DELETE 204: should delete comment from the id provided and return no content", () => {
+    return request(app)
+      .delete("/api/comments/10")
+      .expect(204)
+      .then((body) => {
+        expect(body.res.statusMessage).toBe("No Content");
+      });
+  });
+  it("DELETE 404: a comment id that doesnt exist", () => {
+    return request(app)
+      .delete("/api/comments/50")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Comment not found");
+      });
+  });
+  it("DELETE 400: a string instead of an integer", () => {
+    return request(app)
+      .delete("/api/comments/fifty")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+  it("DELETE 404: comments spelled incorrectly", () => {
+    return request(app)
+      .delete("/api/commints/10")
       .expect(404)
       .then((body) => {
         expect(body.res.statusMessage).toBe("Not Found");
