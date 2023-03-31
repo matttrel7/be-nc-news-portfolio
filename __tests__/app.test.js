@@ -629,3 +629,26 @@ describe("/api/articles", () => {
       });
   });
 });
+
+describe("/api/articles/:article_id", () => {
+  it("GET 200: should respond with an article object with comment_count now added", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body }) => {
+        const result = body.article;
+        expect(result).toBeInstanceOf(Object);
+        expect(result).toMatchObject({
+          article_id: 1,
+          author: "butter_bridge",
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          body: expect.any(String),
+          created_at: expect.any(String),
+          votes: 100,
+          article_img_url: expect.any(String),
+          comment_count: 11,
+        });
+      });
+  });
+});
