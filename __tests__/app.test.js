@@ -459,6 +459,36 @@ describe("/api/articles/:article_id", () => {
   });
 });
 
+
+describe("/api/users", () => {
+  it("GET 200: repsonds with array of objects of users", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const result = body.users;
+        expect(result).toBeInstanceOf(Array);
+        result.forEach((user) => {
+          expect(user).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
+          });
+        });
+      });
+  });
+  it('404: reponds with "Not Found" if users is misspelt', () => {
+    return request(app)
+      .get("/api/usors")
+      .expect(404)
+      .then((body) => {
+        expect(body.res.statusMessage).toBe("Not Found");
+      });
+  });
+  it('404: reponds with "Not Found" if given an integer instead of string', () => {
+    return request(app)
+      .get("/api/10")
+
 describe("/api/comments/:comment_id", () => {
   it("DELETE 204: should delete comment from the id provided and return no content", () => {
     return request(app)

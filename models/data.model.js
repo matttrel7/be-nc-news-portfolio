@@ -97,6 +97,15 @@ exports.updateArticle = (votes, articleId) => {
   });
 };
 
+
+exports.fetchUsers = () => {
+  return db.query(`SELECT * FROM users`).then((result) => {
+    if (result.rowCount > 0) {
+      const users = result.rows;
+      return users;
+    } else {
+      return Promise.reject({ status: 404, msg: "Invalid request" });
+
 exports.removeComment = (commentId) => {
   const psqlQuery = `DELETE FROM comments WHERE comment_id = $1 RETURNING *;`;
 
@@ -105,6 +114,7 @@ exports.removeComment = (commentId) => {
       return result.rows[0];
     } else {
       return Promise.reject({ status: 404, msg: "Comment not found" });
+
     }
   });
 };

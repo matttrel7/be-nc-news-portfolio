@@ -6,6 +6,7 @@ const {
   checkArticleExists,
   insertComment,
   updateArticle,
+  fetchUsers,
   removeComment,
 } = require("../models/data.model");
 
@@ -78,11 +79,17 @@ exports.patchArticle = (req, res, next) => {
     });
 };
 
+
+exports.getUsers = (req, res, next) => {
+  fetchUsers()
+    .then((users) => {
+      res.status(200).send({ users });
 exports.deleteComment = (req, res, next) => {
   const commentId = req.params.comment_id;
   removeComment(commentId)
     .then((comment) => {
       res.status(204).send({ msg: "No content" });
+
     })
     .catch((err) => {
       next(err);
