@@ -2,7 +2,7 @@
 
 ## Background
 
-This API provides access to news articles and comments. It was built using PostgreSQL and Node.js with the Node-Postgres library.
+This API provides access to news articles and comments. It was built using PostgreSQL and Node.js with the Node-Postgres library. Test-Driven Development (TDD) practices were followed throughout the development process, with Jest as the testing framework.
 
 ## Usage
 
