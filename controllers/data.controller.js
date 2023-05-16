@@ -33,7 +33,6 @@ exports.getArticlesById = (req, res, next) => {
 
 exports.getArticles = (req, res, next) => {
   const { sort_by, order, topic } = req.query;
-
   fetchTopics(topic)
     .then((result) => {
       if (result.length === 0) {

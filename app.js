@@ -22,7 +22,16 @@ const {
 } = require("./error-handling");
 
 app.get("/api", (req, res) => {
-  res.status(200).send({ msg: "Working okay" });
+  res.status(200).send({
+    msg: "Working okay",
+    end_points: [
+      "/api/topics",
+      "/api/articles",
+      "/api/articles/:article_id",
+      "/api/articles/:article_id/comments",
+      "/api/users",
+    ],
+  });
 });
 app.get("/api/topics", getTopics);
 app.get("/api/articles/:article_id", getArticlesById);
